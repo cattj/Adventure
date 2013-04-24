@@ -2,6 +2,7 @@ package com.adventure;
 
 import java.io.IOException;
 import java.util.List;
+import com.google.appengine.api.log.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +14,24 @@ import com.adventure.entity.AdventureCharacter;
 
 @SuppressWarnings("serial")
 public class AdventureServlet extends HttpServlet {
-
+	@Override
+	public void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
+		AdventureCharacterDAO adventureCharDAO = new AdventureCharacterDAO();
+		List<AdventureCharacter> chars = adventureCharDAO
+				.findAll(AdventureCharacter.class);
+		if (chars.size() == 0) {
+			AdventureCharacter newChar = new AdventureCharacter();
+			newChar.setCharacterName("TESTCHAR");
+			
+			AdventureEntityManager.get().createEntityManager().persist(newChar);
+		}
+		for (AdventureCharacter character : chars) {
+			System.out.println(character.getCharacterName());
+		}
+		resp.sendRedirect("/charlist.jsp");
+	}
+	
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
@@ -28,5 +46,6 @@ public class AdventureServlet extends HttpServlet {
 		for (AdventureCharacter character : chars) {
 			System.out.println(character.getCharacterName());
 		}
+		resp.sendRedirect("/charlist.jsp");
 	}
 }
